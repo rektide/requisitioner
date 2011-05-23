@@ -1,0 +1,1 @@
+../../requisitioner-server/bin/requisitioner-command.js
