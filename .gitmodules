@@ -1,0 +1,3 @@
+[submodule "require-2"]
+	path = require
+	url = https://github.com/marcuswestin/require.git

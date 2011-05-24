@@ -30,7 +30,6 @@ function stripRequire(requireStatement) {
 	  close= requireStatement.indexOf(")"),
 	  expr = requireStatement.substring(open,close),
 	  evalled = eval(expr)
-	console.log("stripped: "+expr+", "+evalled)
 	return evalled
 }
 

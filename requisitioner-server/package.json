@@ -1,0 +1,23 @@
+{
+  "name": "requisitioner-server",
+  "description": "javascript module management! brings node/commonjs modules 1.0's require statement to the browser",
+  "version": "0.1.0",
+  "homepage": "https://cgit.voodoowarez.com/requisitioner-server",
+  "main": "./require",
+  "bin": {
+	"require": "./bin/require-command.js",
+	"requisitioner": "./bin/requisitioner-command.js"
+  },
+  "engines": {
+    "node": "*",
+    "browsers": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://voodoowarez.com/rektide/requsitioner-server.git"
+  },
+  "author": "rektide <rektide@voodoowarez.com> (http://rektide.voodoowarez.com)",
+  "dependencies": {},
+  "devDependencies": {},
+  "directories": {}
+}

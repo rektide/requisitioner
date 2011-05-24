@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 var path = require('path'),
-	server = require('../requisitioner-server'),
+	server = require('requisitioner-server'),
 	sys = require('sys'),
 	compiler = require('../compiler')
 

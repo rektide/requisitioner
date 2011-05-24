@@ -3,10 +3,11 @@ var r_module = (function()
 	function makeModule(name) { return {name:name,exports:{},loaded:false,deps:[],resolved:[],depsCnt:0} }
 	function isArray(o) { return Object.prototype.toString.call(o) === "[object Array]"; }
 
-	var r_module = makeModule("require"),
+	var r_module = makeModule("requisitioner"),
 	  exports = r_module.exports,
 	  exportsModule = makeModule("exports"),
-	  modules = {require:r_module,exports:exportsModule},
+	  moduleModule = makeModule("module"),
+	  modules = {require:r_module,exports:exportsModule,module:moduleModule},
 	  unresolved = {}
 
 	exports.require = function(deps,callback)
@@ -38,16 +39,20 @@ var r_module = (function()
 		callback.call(null,resolved)
 	}
 
-	function runModule(module)
+	function runModule(module_running)
 	{
-		exportsModule.exports = module.exports
-		modules[module.name] = module
+		exportsModule.exports = module_running.exports
+		moduleModule.exports = module_running.exports
+		module.exports = module_running.exports
+		modules[module_running.name] = module_running
 
 		var retval
-		if(module.callback)
-			retval = module.callback.call(null,module.resolved)
+		if(module_running.callback)
+			retval = module_running.callback.call(null,module_running.resolved)
+		if(module.exports != module_running.exports)
+			module_running.exports = module.exports
 		if(typeof retval == 'object')
-			module.exports = retval
+			module_running.exports = retval
 	}
 
 	exports.define = function(name,dependencies,m)
@@ -79,9 +84,10 @@ var r_module = (function()
 			}
 			else
 			{
-				module.resolved[i] = dep.exports
+				module.resolved[dep] = dep.exports
 			}
 		}
+		module.callback = m
 		if(complete)
 			runModule(module)
 	}
@@ -93,3 +99,7 @@ if(typeof require == "undefined")
 	require = r_module.require
 if(typeof define == "undefined")
 	define = r_module.define
+if(typeof module == "undefined")
+	module = require('module')
+if(typeof exports == "undefined")
+	module = require('exports')
