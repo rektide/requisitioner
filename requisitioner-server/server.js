@@ -6,7 +6,8 @@ var http = require('http'),
 var server = module.exports = {
 	listen: listen,
 	addPath: addPath,
-	setRoot: setRoot
+	setRoot: setRoot,
+	pipeModule: pipeModule
 }
 
 var modules = {},
@@ -33,55 +34,52 @@ function stripRequire(requireStatement) {
 	return evalled
 }
 
+function pipeModule(module,outStream,options) {
+	fs.readFile(module,function(err,content) {
+			if (err) { return outStream.end('alert("' + err + '")') }
+			var code = content.toString()
+
+			// name
+			var name = module.substring(0,module.length-3),
+				preamble = [closureStart,"'",name,"',["]
+
+			// dependencies     
+			var requireStatements = util.getRequireStatements(code),
+			isFirst = true
+			for (var i=0, requireEntry; requireEntry = requireStatements[i]; i++) {    
+				if(!isFirst)
+				preamble.push(",")
+				var val = stripRequire(requireEntry)
+				preamble.push("'",val,"'")
+			}
+			// code and closure-end
+			preamble.push("],function(){\n",code,closureEnd)
+
+			if(options && options["end"] === false)
+				outStream.write(preamble.join(""))
+			else
+				outStream.end(preamble.join(""))
+	})
+}
+
+
 function listen(port, host) {
 	port = port || 1234
 	host = typeof host == 'undefined' ? 'localhost' : host
 	var server = http.createServer(function(req, res) {
 		var reqPath = req.url.substr(root.length)
-		if (reqPath.match(/\.js$/)) {
-			fs.readFile(reqPath, function(err, content) {
-				if (err) { return res.end('alert("' + err + '")') }
-				var code = content.toString()
-
-				// name
-				var name = reqPath.substring(0,reqPath.length-3),
-				  preamble = [closureStart,"'",name,"',["]
-
-				// dependencies	
-				var requireStatements = util.getRequireStatements(code),
-				  isFirst = true
-				for (var i=0, requireEntry; requireEntry = requireStatements[i]; i++) 
-				{
-					if(!isFirst)
-						preamble.push(",")
-					var val = stripRequire(requireEntry)
-					preamble.push("'",val,"'")
-				}
-				// module definition
-				preamble.push("],function(){\n")
-				res.write(preamble.join(""))
-
-				res.write(code)
-
-				// footer
-				res.end(closureEnd)
-			})
+		if (reqPath.match(/\.jsm$/)) {
+			reqPath = reqPath.substring(0,reqPath.length-1)
+			pipeModule(reqPath,res)
 		} else {
-			// main module
 			try {
-				var modulePath = util.resolve(reqPath),
-					deps = util.getDependencyList(modulePath),
-					base = '//' + host + ':' + port + root
-	
-				res.write('var require = {}\n')
-				for (var i=0; i<deps.length; i++) {
-					var depPath = base + deps[i]
-					res.write('document.write(\'<script src="'+depPath+'"></script>\')\n')
-				}
-			} catch(e) {
-				res.write('alert("error in ' + (modulePath || reqPath) + ': ' + e + '")')
+				var fsStream = fs.createReadStream(reqPath)
+				fsStream.pipe(res)
 			}
-			res.end()
+			catch (ex) {
+				res.writeHead(404)
+				res.end()
+			}
 		}
 	})
 	server.listen(port, host)
