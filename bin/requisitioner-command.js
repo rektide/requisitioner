@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 var path = require('path'),
-	server = require('requisitioner-server'),
+	server = require('requisitioner'),
 	sys = require('sys'),
-	compiler = require('../compiler')
+	compiler = require('requisitioner/compiler')
 
 var opts = {
 	paths:   [],
