@@ -1,7 +1,7 @@
-var http = require('http'),
+var require_server = require('require/server'),
+	util = require('require/lib/util'),
+	http = require('http'),
 	fs = require('fs'),
-	path = require('path'),
-	util = require('./lib/util')
 
 var server = module.exports = {
 	listen: listen,

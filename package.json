@@ -16,7 +16,8 @@
     "url": "git://voodoowarez.com/requisitioner.git"
   },
   "author": "rektide <rektide@voodoowarez.com> (http://rektide.voodoowarez.com)",
-  "dependencies": {},
+  "dependencies": { "std": "0.1.22",
+	"require": "0.4.4" },
   "devDependencies": {},
   "directories": {}
 }
