@@ -17,7 +17,7 @@
   },
   "author": "rektide <rektide@voodoowarez.com> (http://rektide.voodoowarez.com)",
   "dependencies": { "std": "0.1.22",
-	"require": "0.4.4" },
+    "uglify-js": "1.0.3" }, 
   "devDependencies": {},
   "directories": {}
 }
