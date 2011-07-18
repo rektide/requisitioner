@@ -1,1 +1,4 @@
-../../../require/example/shared/dependency.js
+module.exports = {
+	foo: 'bar',
+	cat: 'qwe'
+}
