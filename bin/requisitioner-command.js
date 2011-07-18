@@ -1,26 +1,21 @@
 #!/usr/bin/env node
 
 var path = require('path'),
-	server = require('requisitioner'),
 	sys = require('sys'),
-	compiler = require('requisitioner/compiler')
+	server = require('../server'),
+	compiler = require('../compiler')
 
 var opts = {
-	paths:   [],
 	port:    1234,
 	host:    'localhost',
-	level:   null,
-	command: 'server',
-	file: null
+	command: null,
+	path:    null
 }
 
-var args = [].slice.call(process.argv, 2),
-	commands = ['server', 'compile']
+var args = [].slice.call(process.argv, 2)
 
-if (commands.indexOf(args[0]) != -1) {
-	opts.command = args.shift()
-	opts.file = args.shift()
-}
+opts.command = args.shift()
+opts.path = path.resolve(args.shift())
 
 while (args.length) {
 	var arg = args.shift()
@@ -31,14 +26,6 @@ while (args.length) {
 		case '--host':
 			opts.host = args.shift()
 			break
-		case '--level':
-			opts.level = parseInt(args.shift())
-			break
-		case '--paths':
-			while(args[0] && args[0].charAt(0) != '-') {
-				opts.paths.push(path.resolve(process.cwd(), args.shift()))
-			}
-			break
 		default:
 			console.log('Unknown option', arg)
 			process.exit(1)
@@ -47,34 +34,27 @@ while (args.length) {
 }
 
 switch (opts.command) {
-	case 'server':
-		for (var i=0; i<opts.paths.length; i++) { server.addPath(opts.paths[i]) }
-		server.listen(opts.port, opts.host)
-		console.log('dev server listening on', 'http://'+opts.host + ':' + opts.port, 'with paths:\n', opts.paths.concat(require.paths))
+	case 'serve':
+		if (!opts.path) {
+			console.log('Specify a path to serve from, e.g. requsitioner serve ./example')
+			process.exit(1)
+		}
+		server.listen(opts.port, { host:opts.host, path:opts.path })
+		console.log('serving from', opts.path, 'on', 'http://'+opts.host+':'+opts.port)
 		break
 	case 'compile':
-		var example = 'require compile ./path/to/file.js --level 2'
-		if (opts.level === null) {
-			console.log('Specify a compilation level, e.g.')
-			console.log(example)
+		if (!opts.path) {
+			console.log('Specify a single file to compile, e.g. requisitioner compile ./path/to/file.js')
 			process.exit(1)
 		}
-		if (!opts.file) {
-			console.log('Specify a single file to compile, e.g.')
-			console.log(example)
-			process.exit(1)
-		}
-		for (var i=0; i<opts.paths.length; i++) { compiler.addPath(opts.paths[i]) }
-		compiler.compile(opts.file, opts.level, function(err, compiledCode) {
-			if (err) {
-				console.log('Compilation error', err)
-				process.exit(1)
-			}
-			sys.print(compiledCode)
-		})
+		sys.print(compiler.compile(opts.path))
 		break
 	default:
-		console.log('Unknown command', opts.command)
+		if (opts.command) {
+			console.log('Unknown command', '"' + opts.command + '".', 'Try "requisitioner serve" or "requsitioner compile"')
+		} else {
+			console.log('You need to give a command, e.g. "requisitioner serve" or "requisitioner compile"')
+		}
 		process.exit(1)
 }
 

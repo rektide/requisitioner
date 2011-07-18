@@ -53,6 +53,25 @@ var r_module = (function()
 			module_running.exports = module.exports
 		if(typeof retval == 'object')
 			module_running.exports = retval
+
+		var name = module_running.name,
+		  thenModules = unresolved[name]
+		for(var i in thenModules)
+		{
+			var then = thenModules[i],
+			  definedIndex = then.deps.indexOf(name)
+			if(definedIndex == -1)
+				continue;
+			delete then.deps[definedIndex]
+			then.resolved[definedIndex] = module.exports
+
+			var complete = true
+			for(var i in then.deps)
+				if(then.deps[i])
+					complete = false
+			if(complete)
+				runModule(then)
+		}
 	}
 
 	exports.define = function(name,dependencies,m)
@@ -60,18 +79,7 @@ var r_module = (function()
 		if(!name)
 			throw "Can't define you if you dont state your identity"
 
-		var module = makeModule(name),
-		  thenModules = unresolved[name]
-		for(var i in thenModules)
-		{
-			var then = thenModules[i],
-			  definedIndex = then.deps.indexOf(module.name)
-			delete then.deps[definedIndex]
-			then.resolved[definedIndex] = module.exports
-
-			if(!then.deps.length)
-				runModule(then)
-		}
+		var module = makeModule(name)
 
 		var complete = true
 		for(var i in dependencies)
@@ -81,6 +89,8 @@ var r_module = (function()
 			{
 				complete = false
 				module.deps[i] = dep
+				var unres = unresolved[dep] || (unresolved[dep] = [])
+				unres.push(module)
 			}
 			else
 			{
@@ -88,8 +98,9 @@ var r_module = (function()
 			}
 		}
 		module.callback = m
-		if(complete)
+		if(complete) {
 			runModule(module)
+		}
 	}
 
 	return exports
