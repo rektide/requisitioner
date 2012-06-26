@@ -1,7 +1,7 @@
 {
 	"name": "requisitioner",
 	"description": "node require/commonjs modules 1.0 implementation for the browser",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"homepage": "http://voodoowarez.com/pipe-layer",
 	"author": {
 		"name": "rektide de la faye",
@@ -27,11 +27,11 @@
 	},
 	"dependencies": {
 		"esprima": "0.9.9",
-		"npm": "1.1.30",
-		"node-resolve": "git://github.com/substack/node-resolve#a9643965438eb4fcb068a5876b317f516199879a",
+		"node-module-resolver": "1.0.0",
 		"JSONPath": "0.9.0",
 		"async": "0.1.22",
-		"lazy": "1.0.8"
+		"clone": "0.1.0",
+		"node-module-resolver": "1.0.0"
 	},
 	"devDependencies": {
 		"grunt": "~0.3.9"
