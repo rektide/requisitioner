@@ -20,6 +20,8 @@ Connect endpoint that uses tracker to build prepack modules-cum-dependencies, or
 
 # TODO
 * Presently dependency tracking is performed by static analysis. Package.json is not used for resolving dependencies. Supplementing the static analysis with dependency tracking could be useful information.
+* Monitor entire directories for changes.
+* Tracker watch doesn't properly prep for the re-load of a file, creates duplicate data or obsolete data.
 
 # Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style.
